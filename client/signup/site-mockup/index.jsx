@@ -18,7 +18,9 @@ import { getSiteVerticalPreview } from 'state/signup/steps/site-vertical/selecto
 import { getSiteInformation } from 'state/signup/steps/site-information/selectors';
 import { getSiteStyle } from 'state/signup/steps/site-style/selectors';
 import { loadFont, getCSS } from 'lib/signup/font-loader';
+import SignupSitePreview from 'components/signup-site-preview'
 import Gridicon from 'gridicons';
+
 
 /**
  * Style dependencies
@@ -55,19 +57,19 @@ class SiteMockups extends Component {
 			fontError: false,
 		};
 
-		this.fontLoader = loadFont( props.siteStyle, props.siteType );
+/*		this.fontLoader = loadFont( props.siteStyle, props.siteType );
 		this.fontLoader.then( () => this.setState( { fontLoaded: true } ) );
-		this.fontLoader.catch( () => this.setState( { fontError: true } ) );
+		this.fontLoader.catch( () => this.setState( { fontError: true } ) );*/
 		return state;
 	}
 
 	resetFontLoaderState( props ) {
-		this.setState( this.getNewFontLoaderState( props ) );
+		//this.setState( this.getNewFontLoaderState( props ) );
 	}
 
 	componentDidUpdate( prevProps ) {
 		if ( prevProps.siteStyle !== this.props.siteStyle ) {
-			this.resetFontLoaderState( this.props );
+			//this.resetFontLoaderState( this.props );
 		}
 	}
 
@@ -102,7 +104,13 @@ class SiteMockups extends Component {
 			return translate( 'You’ll be able to customize this to your needs.' );
 		}
 
-		return (
+		return [
+			hasAddress ? this.formatAddress( address ) : '',
+			hasAddress && hasPhone ? ' &middot; ' : '',
+			hasPhone ? phone : '',
+		].join( '' );
+
+/*		return (
 			<>
 				{ hasAddress && (
 					<span className="site-mockup__address">{ this.formatAddress( address ) }</span>
@@ -112,7 +120,7 @@ class SiteMockups extends Component {
 				) }
 				{ hasPhone && <span className="site-mockup__phone">{ phone }</span> }
 			</>
-		);
+		);*/
 	}
 
 	/**
@@ -130,22 +138,27 @@ class SiteMockups extends Component {
 		const siteMockupClasses = classNames( {
 			'site-mockup__wrap': true,
 			'is-empty': isEmpty( verticalPreviewContent ),
-			'is-font-loading': ! this.state.fontLoaded,
-			'is-font-error': ! this.state.fontError,
+			/*	'is-font-loading': ! this.state.fontLoaded,
+				'is-font-error': ! this.state.fontError,*/
 		} );
 		const otherProps = {
-			title,
-			tagline: this.getTagline(),
-			content: this.getContent( verticalPreviewContent ),
+			content: {
+				title,
+				tagline: this.getTagline(),
+				body: this.getContent( verticalPreviewContent ),
+			},
 			siteType,
 			siteStyle,
 		};
-		const fontStyle = getCSS( `.site-mockup__content`, siteStyle, siteType );
+		//const fontStyle = getCSS( `.site-mockup__content`, siteStyle, siteType );
 
 		return (
 			<div className={ siteMockupClasses }>
+{/*
 				{ ! this.state.fontError && <style>{ fontStyle }</style> }
-
+*/}
+		{/*		<SiteMockup size="desktop" { ...otherProps } />
+				<SiteMockup size="mobile" { ...otherProps } />*/}
 				<div className="site-mockup__help-tip">
 					<p>
 						{ translate(
@@ -154,11 +167,7 @@ class SiteMockups extends Component {
 					</p>
 					<Gridicon icon="chevron-down" />
 				</div>
-
-				<div className="site-mockup__devices">
-					<SiteMockup size="desktop" { ...otherProps } />
-					<SiteMockup size="mobile" { ...otherProps } />
-				</div>
+				<SignupSitePreview defaultViewportDevice="desktop" { ...otherProps } cssUrl="test" />
 			</div>
 		);
 	}
