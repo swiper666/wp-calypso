@@ -14,7 +14,10 @@ import { translate } from 'i18n-calypso';
  */
 import SiteMockup from './site-mockup';
 import { getSiteType } from 'state/signup/steps/site-type/selectors';
-import { getSiteVerticalPreview } from 'state/signup/steps/site-vertical/selectors';
+import {
+	getSiteVerticalName,
+	getSiteVerticalPreview,
+} from 'state/signup/steps/site-vertical/selectors';
 import { getSiteInformation } from 'state/signup/steps/site-information/selectors';
 import { getSiteStyle } from 'state/signup/steps/site-style/selectors';
 import { loadFont, getCSS } from 'lib/signup/font-loader';
@@ -34,6 +37,7 @@ class SiteMockups extends Component {
 		siteStyle: PropTypes.string,
 		siteType: PropTypes.string,
 		title: PropTypes.string,
+		vertical: PropTypes.string,
 		verticalPreviewContent: PropTypes.string,
 	};
 
@@ -43,6 +47,7 @@ class SiteMockups extends Component {
 		siteStyle: '',
 		siteType: '',
 		title: '',
+		vertical: '',
 		verticalPreviewContent: '',
 	};
 
@@ -134,7 +139,7 @@ class SiteMockups extends Component {
 	}
 
 	render() {
-		const { siteStyle, siteType, title, verticalPreviewContent } = this.props;
+		const { siteStyle, siteType, title, verticalName, verticalPreviewContent } = this.props;
 		const siteMockupClasses = classNames( {
 			'site-mockup__wrap': true,
 			'is-empty': isEmpty( verticalPreviewContent ),
@@ -149,6 +154,7 @@ class SiteMockups extends Component {
 			},
 			siteType,
 			siteStyle,
+			verticalName,
 		};
 		//const fontStyle = getCSS( `.site-mockup__content`, siteStyle, siteType );
 
@@ -181,6 +187,7 @@ export default connect( state => {
 		phone: siteInformation.phone,
 		siteStyle: getSiteStyle( state ),
 		siteType: getSiteType( state ),
+		verticalName: getSiteVerticalName( state ),
 		verticalPreviewContent: getSiteVerticalPreview( state ),
 	};
 } )( SiteMockups );
