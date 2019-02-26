@@ -565,6 +565,7 @@ class Signup extends React.Component {
 						/>
 					) }
 				</div>
+				{ propsFromConfig.showSiteMockups && <SiteMockups /> }
 			</div>
 		);
 	}
@@ -628,7 +629,6 @@ class Signup extends React.Component {
 						redirectTo={ this.state.redirectTo }
 					/>
 				) }
-				<SiteMockups />
 			</div>
 		);
 	}

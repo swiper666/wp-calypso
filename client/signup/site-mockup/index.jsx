@@ -6,13 +6,12 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
-import { each, isEmpty } from 'lodash';
+import { each, find, isEmpty } from 'lodash';
 import { translate } from 'i18n-calypso';
 
 /**
  * Internal dependencies
  */
-import SiteMockup from './site-mockup';
 import { getSiteType } from 'state/signup/steps/site-type/selectors';
 import {
 	getSiteVerticalName,
@@ -20,10 +19,9 @@ import {
 } from 'state/signup/steps/site-vertical/selectors';
 import { getSiteInformation } from 'state/signup/steps/site-information/selectors';
 import { getSiteStyle } from 'state/signup/steps/site-style/selectors';
-import { loadFont, getCSS } from 'lib/signup/font-loader';
 import SignupSitePreview from 'components/signup-site-preview'
 import Gridicon from 'gridicons';
-
+import { getSiteStyleOptions } from 'lib/signup/site-styles';
 
 /**
  * Style dependencies
@@ -50,33 +48,6 @@ class SiteMockups extends Component {
 		vertical: '',
 		verticalPreviewContent: '',
 	};
-
-	constructor( props ) {
-		super( props );
-		this.state = this.getNewFontLoaderState( props );
-	}
-
-	getNewFontLoaderState( props ) {
-		const state = {
-			fontLoaded: false,
-			fontError: false,
-		};
-
-/*		this.fontLoader = loadFont( props.siteStyle, props.siteType );
-		this.fontLoader.then( () => this.setState( { fontLoaded: true } ) );
-		this.fontLoader.catch( () => this.setState( { fontError: true } ) );*/
-		return state;
-	}
-
-	resetFontLoaderState( props ) {
-		//this.setState( this.getNewFontLoaderState( props ) );
-	}
-
-	componentDidUpdate( prevProps ) {
-		if ( prevProps.siteStyle !== this.props.siteStyle ) {
-			//this.resetFontLoaderState( this.props );
-		}
-	}
 
 	/**
 	 * Returns an interpolated site preview content block with template markers
@@ -114,18 +85,6 @@ class SiteMockups extends Component {
 			hasAddress && hasPhone ? ' &middot; ' : '',
 			hasPhone ? phone : '',
 		].join( '' );
-
-/*		return (
-			<>
-				{ hasAddress && (
-					<span className="site-mockup__address">{ this.formatAddress( address ) }</span>
-				) }
-				{ hasAddress && hasPhone && (
-					<span className="site-mockup__tagline-separator"> &middot; </span>
-				) }
-				{ hasPhone && <span className="site-mockup__phone">{ phone }</span> }
-			</>
-		);*/
 	}
 
 	/**
@@ -139,14 +98,13 @@ class SiteMockups extends Component {
 	}
 
 	render() {
-		const { siteStyle, siteType, title, verticalName, verticalPreviewContent } = this.props;
+		const { font, siteStyle, siteType, title, themeSlug, verticalName, verticalPreviewContent } = this.props;
 		const siteMockupClasses = classNames( {
 			'site-mockup__wrap': true,
 			'is-empty': isEmpty( verticalPreviewContent ),
-			/*	'is-font-loading': ! this.state.fontLoaded,
-				'is-font-error': ! this.state.fontError,*/
 		} );
 		const otherProps = {
+			font,
 			content: {
 				title,
 				tagline: this.getTagline(),
@@ -155,16 +113,11 @@ class SiteMockups extends Component {
 			siteType,
 			siteStyle,
 			verticalName,
+			themeSlug,
 		};
-		//const fontStyle = getCSS( `.site-mockup__content`, siteStyle, siteType );
 
 		return (
 			<div className={ siteMockupClasses }>
-{/*
-				{ ! this.state.fontError && <style>{ fontStyle }</style> }
-*/}
-		{/*		<SiteMockup size="desktop" { ...otherProps } />
-				<SiteMockup size="mobile" { ...otherProps } />*/}
 				<div className="site-mockup__help-tip">
 					<p>
 						{ translate(
@@ -173,21 +126,30 @@ class SiteMockups extends Component {
 					</p>
 					<Gridicon icon="chevron-down" />
 				</div>
-				<SignupSitePreview defaultViewportDevice="desktop" { ...otherProps } cssUrl="test" />
-			</div>
+				<SignupSitePreview defaultViewportDevice="desktop" { ...otherProps } />
+				<SignupSitePreview defaultViewportDevice="phone" { ...otherProps } />			</div>
 		);
 	}
 }
 
 export default connect( state => {
 	const siteInformation = getSiteInformation( state );
+	const siteStyle = getSiteStyle( state );
+	const siteType = getSiteType( state );
+	const styleOptions = getSiteStyleOptions( siteType );
+	const style = find( styleOptions, { id: siteStyle || 'default' } );
 	return {
 		title: siteInformation.title || translate( 'Your New Website' ),
 		address: siteInformation.address,
 		phone: siteInformation.phone,
-		siteStyle: getSiteStyle( state ),
-		siteType: getSiteType( state ),
+		siteStyle,
+		siteType,
 		verticalName: getSiteVerticalName( state ),
 		verticalPreviewContent: getSiteVerticalPreview( state ),
+		themeSlug: style.theme,
+		font: {
+			...style.font,
+			id: style.font.name.trim().replace( / /g, '+' ),
+		},
 	};
 } )( SiteMockups );
