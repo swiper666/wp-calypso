@@ -16,7 +16,6 @@
 		}
 
 		.site-mockup__viewport.is-desktop {
-		.signup-site-preview__wrapper.is-desktop {
 			margin-right: 16px;
 
 			// Forces the desktop preview to take up
@@ -24,8 +23,8 @@
 			flex-grow: 1;
 		}
 
-		.signup-site-preview__wrapper.is-phone {
-			min-width: 280px;
+		.site-mockup__viewport.is-phone {
+			min-width: 300px;
 
 			.site-mockup__body {
 				height: 440px;
@@ -38,7 +37,7 @@
 	@include breakpoint( '660px-960px' ) {
 		position: relative;
 
-		.signup-site-preview__wrapper.is-phone {
+		.site-mockup__viewport.is-phone {
 			position: absolute;
 			top: 48px;
 			right: 8px;
@@ -58,11 +57,11 @@
 		padding-left: 1px;
 		padding-bottom: 0;
 
-		.signup-site-preview__wrapper.is-desktop {
+		.site-mockup__viewport.is-desktop {
 			display: none;
 		}
 
-		.signup-site-preview__wrapper.is-phone {
+		.site-mockup__viewport.is-phone {
 			width: 100%;
 			max-width: 480px;
 			border-radius: 12px 12px 0 0;
@@ -91,20 +90,11 @@
 		opacity: 0;
 		transform: translateY( 80px );
 	}
-
-	// Hide the tip on all steps.
-	display: none;
-
-	// Display the tip only on these steps.
-	.is-site-topic-with-preview &,
-	.is-site-information-title-with-preview & {
-		display: block;
-	}
 }
 
 // The mockups themselves, both mobile
 // and desktop variants.
-.signup-site-preview__wrapper {
+.site-mockup__viewport {
 	margin: 0 auto;
 	background: var( --color-white );
 	position: relative;
@@ -120,6 +110,7 @@
 
 	&.is-desktop {
 		border-radius: 4px;
+		height: 100%;
 	}
 
 	&.is-phone {
