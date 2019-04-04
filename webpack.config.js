@@ -107,6 +107,7 @@ const nodeModulesToTranspile = [
 	'd3-array/',
 	'd3-scale/',
 	'debug/',
+	'@wordpress/',
 ];
 /**
  * Check to see if we should transpile certain files in node_modules
@@ -319,7 +320,7 @@ function getWebpackConfig( {
 
 	if ( ! config.isEnabled( 'desktop' ) ) {
 		webpackConfig.plugins.push(
-			new webpack.NormalModuleReplacementPlugin( /^lib[/\\]desktop$/, 'lodash/noop' )
+			new webpack.NormalModuleReplacementPlugin( /^lib[/\\]desktop$/, 'lodash-es/noop' )
 		);
 	}
 
