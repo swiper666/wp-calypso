@@ -108,7 +108,7 @@ function getWebpackConfig(
 			new webpack.IgnorePlugin( /^\.\/locale$/, /moment$/ ),
 			...SassConfig.plugins( { cssFilename, minify: ! isDevelopment } ),
 			new DuplicatePackageCheckerPlugin(),
-			new WordPressExternalDependenciesPlugin(),
+			...( env.WP ? [ new WordPressExternalDependenciesPlugin() ] : [] ),
 		],
 	};
 
