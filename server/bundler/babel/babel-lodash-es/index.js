@@ -3,47 +3,49 @@
 module.exports = function( { types } ) {
 	return {
 		visitor: {
-			ImportDeclaration( path ) {
+			ImportDeclaration( path, state ) {
 				const { source } = path.node;
+				let { from, to } = state.opts;
 
-				// Transform any import from 'lodash-es' (exact match, no submodule) to 'lodash'
-				const fullMatch = source.value.match( /^lodash-es$/ );
-				if ( fullMatch ) {
-					source.value = 'lodash';
+				// Defaults: transform from `lodash` to `lodash-es`.
+				from = from || 'lodash';
+				to = to || 'lodash-es';
+
+				// Transform any import with exact match, no submodule
+				const lodashMatch = source.value.match( new RegExp( `^${ from }$` ) );
+				if ( lodashMatch ) {
+					source.value = to;
 					return;
 				}
 
-				// Transform default import from a 'lodash-es' submodule to a a named import from 'lodash'
-				// Example:
-				// In: import theGet from 'lodash-es/get'
-				// Out: import { get as theGet } from 'lodash'
-				const subMatch = source.value.match( /^lodash-es\/(.*)/ );
+				// Transform default import from a submodule to named import
+				// Example with defaults:
+				// In: import theGet from 'lodash/get'
+				// Out: import { get as theGet } from 'lodash-es'
+				const subMatch = source.value.match( new RegExp( `^${ from }/(.*)` ) );
 				if ( subMatch ) {
 					const { specifiers } = path.node;
 					// If there is anything else than a single default import, throw an error. Such an
-					// import is not valid. Example: import { get } from 'lodash-es/get'
-					// There is only the default export in 'lodash-es/get' and no named one.
+					// import is not valid. Example: import { get } from 'lodash/get'
+					// There is only the default export in 'lodash/get' and no named one.
 					if (
 						! specifiers ||
 						specifiers.length !== 1 ||
 						specifiers[ 0 ].type !== 'ImportDefaultSpecifier'
 					) {
 						throw path.buildCodeFrameError(
-							'babel-lodash-es: Could not transform a non-default import from lodash-es/submodule'
+							'babel-lodash-es: Could not transform a non-default import from lodash/submodule'
 						);
 					}
 
 					// Transforms
-					//  `import theGet from 'lodash-es/get'`
+					//  `import theGet from 'lodash/get'`
 					// to
-					//  `import { get as theGet } from 'lodash'`
+					//  `import { get as theGet } from 'lodash-es'`
 					const localIdentifier = specifiers[ 0 ].local;
 					const importedIdentifier = types.identifier( subMatch[ 1 ] );
 					const specifier = types.importSpecifier( localIdentifier, importedIdentifier );
-					const declaration = types.importDeclaration(
-						[ specifier ],
-						types.stringLiteral( 'lodash' )
-					);
+					const declaration = types.importDeclaration( [ specifier ], types.stringLiteral( to ) );
 					path.replaceWith( declaration );
 				}
 			},
