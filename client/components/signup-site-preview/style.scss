@@ -38,10 +38,10 @@
 
 	&.is-phone {
 		border-radius: 12px;
-		width: 280px;
+		width: 350px;
 		transition-delay: 200ms;
 		@include breakpoint( '>960px' ) {
-			min-width: 280px;
+			min-width: 350px;
 		}
 		// Grouped layout shows a fixed-height mobile mockup
 		// overlaid on top of the desktop mockup.
